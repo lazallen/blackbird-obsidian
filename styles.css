@@ -2595,3 +2595,83 @@ button.wt-spawn-claude-ctx:hover svg {
   overflow: auto;
   padding: 12px 16px;
 }
+
+/* =============================================================================
+   Blackbird - Adapter CSS
+   All classes prefixed with bb- to avoid conflicts.
+   ============================================================================= */
+
+/* ---- Task cards ---- */
+.bb-card {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--background-secondary);
+  margin-bottom: 6px;
+  cursor: pointer;
+  position: relative;
+}
+.bb-card:hover { background: var(--background-modifier-hover); }
+.bb-tier-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+.bb-tier-1 { background: var(--color-blue); color: white; }
+.bb-tier-2 { background: var(--color-purple); color: white; }
+.bb-card-title { font-size: 13px; font-weight: 500; margin: 4px 0; line-height: 1.4; }
+.bb-tag-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.bb-tag-pill {
+  font-size: 10px;
+  background: var(--tag-background);
+  color: var(--tag-color);
+  border-radius: 10px;
+  padding: 1px 6px;
+}
+.bb-card-source { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.bb-promote-btn {
+  margin-top: 6px; font-size: 11px; padding: 2px 8px; border-radius: 4px;
+  background: var(--interactive-accent); color: var(--text-on-accent);
+  border: none; cursor: pointer; display: block;
+}
+.bb-promote-btn:hover { background: var(--interactive-accent-hover); }
+.bb-open-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-muted); padding: 2px; border-radius: 3px;
+  display: flex; align-items: center;
+}
+.bb-open-btn:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.bb-card-note-session { border-left: 3px solid var(--color-green); }
+
+/* ---- Dashboard ---- */
+.blackbird-dashboard { padding: 8px 10px; overflow-y: auto; height: 100%; box-sizing: border-box; }
+.bb-dashboard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.bb-dashboard-title { font-weight: 700; font-size: 14px; letter-spacing: 0.03em; }
+.bb-dashboard-refresh { background: transparent; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 4px; border-radius: 4px; }
+.bb-dashboard-refresh:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.bb-dashboard-section { margin-bottom: 14px; }
+.bb-dashboard-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+.bb-dashboard-empty { font-size: 12px; color: var(--text-faint); padding: 2px 0; }
+.bb-dashboard-error { font-size: 12px; color: var(--text-error); }
+.bb-dashboard-item {
+  display: flex; align-items: center; gap: 6px; padding: 5px 6px;
+  border-radius: 5px; cursor: pointer; margin-bottom: 3px;
+  background: var(--background-secondary); overflow: hidden;
+}
+.bb-dashboard-item:hover { background: var(--background-modifier-hover); }
+.bb-dashboard-item-icon { flex-shrink: 0; font-size: 13px; }
+.bb-dashboard-tier { flex-shrink: 0; font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.05em; }
+.bb-dashboard-item-label { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bb-dashboard-item-source { flex-shrink: 0; font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+.bb-manager-section { border-top: 1px solid var(--background-modifier-border); padding-top: 10px; }
+.bb-dashboard-manager-btn {
+  width: 100%; padding: 7px 10px;
+  background: var(--interactive-accent); color: var(--text-on-accent);
+  border: none; border-radius: 5px; cursor: pointer;
+  font-size: 12px; font-weight: 600; text-align: left;
+}
+.bb-dashboard-manager-btn:hover { background: var(--interactive-accent-hover); }

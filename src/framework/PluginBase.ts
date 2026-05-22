@@ -40,11 +40,11 @@ export abstract class PluginBase extends Plugin {
 
     this.registerView(VIEW_TYPE, (leaf) => new MainView(leaf, this.adapter, this));
 
-    this.addRibbonIcon("terminal", "Work Terminal", () => this.activateView());
+    this.addRibbonIcon("terminal", "Blackbird", () => this.activateView());
 
     this.addCommand({
       id: "open-work-terminal",
-      name: "Open Work Terminal",
+      name: "Open Blackbird",
       callback: () => this.activateView(),
     });
 
@@ -77,7 +77,7 @@ export abstract class PluginBase extends Plugin {
 
   async hotReload(): Promise<void> {
     this._isReloading = true;
-    console.log("[work-terminal] Hot reload...");
+    console.log("[blackbird] Hot reload...");
 
     // Explicitly stash terminal sessions BEFORE disabling, because
     // disablePlugin's cleanup sequence may trigger selection changes
@@ -89,8 +89,8 @@ export abstract class PluginBase extends Plugin {
 
     const appRef = this.app;
     const plugins = (appRef as any).plugins;
-    await plugins.disablePlugin("work-terminal");
-    await plugins.enablePlugin("work-terminal");
+    await plugins.disablePlugin("blackbird");
+    await plugins.enablePlugin("blackbird");
 
     // The new plugin instance re-registered the view type. Force the
     // existing leaf to re-create its view so onOpen() fires and picks
@@ -104,12 +104,12 @@ export abstract class PluginBase extends Plugin {
       }
       appRef.workspace.revealLeaf(existingLeaves[0]);
     } else {
-      const newPlugin = plugins.plugins["work-terminal"];
+      const newPlugin = plugins.plugins["blackbird"];
       if (newPlugin && typeof newPlugin.activateView === "function") {
         await newPlugin.activateView();
       }
     }
-    console.log("[work-terminal] Hot reload complete");
+    console.log("[blackbird] Hot reload complete");
   }
 
   get isReloading(): boolean {
@@ -141,7 +141,7 @@ export abstract class PluginBase extends Plugin {
           : openWorkTerminalLeaves[0];
     const copyDiagnostics = (workTerminalLeaf?.view as any)?.copySessionDiagnostics;
     if (typeof copyDiagnostics !== "function") {
-      new Notice("Open Work Terminal first to copy session diagnostics");
+      new Notice("Open Blackbird first to copy session diagnostics");
       return;
     }
     await copyDiagnostics.call(workTerminalLeaf?.view);
