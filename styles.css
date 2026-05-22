@@ -2683,3 +2683,10 @@ button.wt-spawn-claude-ctx:hover svg {
   font-size: 12px; font-weight: 500; text-align: left;
 }
 .bb-dashboard-journal-btn:hover { background: var(--background-modifier-hover); }
+
+/* Hide the work-terminal list panel — Blackbird uses the sidebar dashboard instead */
+.wt-left-panel { display: none !important; }
+/* Remove the divider left border since list panel is gone */
+.wt-right-panel { border-left: none !important; }
+/* Remove the drag handle */
+.wt-divider { display: none !important; }

@@ -130,15 +130,51 @@ export default class BlackbirdPlugin extends PluginBase {
     }
   }
 
+  /**
+   * Opens a task item as a split workspace: note file on the left, terminal
+   * on the right. The framework's list panel is hidden via CSS since the
+   * sidebar dashboard is the task list for Blackbird.
+   */
   private async openItemInMainPanel(itemId: string): Promise<void> {
-    await this.activateView();
-    setTimeout(() => {
-      const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
-      if (leaves.length > 0) {
-        const mainView = leaves[0].view as any;
-        mainView?.listPanel?.selectById(itemId);
+    // Load items to find the note path for this item
+    const items = await this._adapter.getDashboardItems(this.app);
+    const item = items.find((i) => i.id === itemId);
+
+    // Step 1: open the note file in the main area
+    if (item?.path) {
+      const file = this.app.vault.getAbstractFileByPath(item.path) as
+        | import("obsidian").TFile
+        | null;
+      if (file) {
+        // Use the active leaf (or a new tab) for the note
+        const noteLeaf = this.app.workspace.getMostRecentLeaf() ?? this.app.workspace.getLeaf(true);
+        await noteLeaf.openFile(file);
       }
-    }, 300);
+    }
+
+    // Step 2: ensure the work-terminal view exists as a split to the right
+    let terminalLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE)[0] ?? null;
+    if (!terminalLeaf) {
+      // Get the note leaf and split right from it
+      const activeLeaf = this.app.workspace.getMostRecentLeaf();
+      const newLeaf = activeLeaf
+        ? this.app.workspace.createLeafBySplit(activeLeaf, "vertical")
+        : this.app.workspace.getLeaf(true);
+      await newLeaf.setViewState({ type: VIEW_TYPE, active: false });
+      terminalLeaf = newLeaf;
+    } else {
+      this.app.workspace.revealLeaf(terminalLeaf);
+    }
+
+    // Step 3: select the item and auto-launch Claude after the view initialises
+    setTimeout(() => {
+      const mainView = terminalLeaf?.view as any;
+      mainView?.listPanel?.selectById(itemId);
+      if (item) {
+        const prompt = this._adapter.createPromptBuilder().buildPrompt(item, item.path ?? "");
+        void mainView?.terminalPanel?.spawnClaudeWithPrompt(prompt, "Task");
+      }
+    }, 400);
   }
 
   private async openWorkSessionForCurrentNote(): Promise<void> {
