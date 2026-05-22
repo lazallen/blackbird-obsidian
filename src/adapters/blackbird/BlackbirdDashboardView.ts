@@ -87,7 +87,7 @@ export class BlackbirdDashboardView extends ItemView {
     // Get all work items from the adapter's parser
     let items: WorkItem[] = [];
     try {
-      items = await this.adapter.getDashboardItems();
+      items = await this.adapter.getDashboardItems(this.app);
     } catch (err) {
       console.error("[blackbird-dashboard] Failed to load items:", err);
       container.createEl("p", { cls: "bb-dashboard-error", text: "Failed to load items." });

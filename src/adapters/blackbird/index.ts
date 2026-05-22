@@ -108,10 +108,13 @@ export class BlackbirdAdapter extends BaseAdapter {
    * Returns all current WorkItems for the dashboard to render.
    * Bypasses the framework list refresh cycle by calling the parser directly.
    */
-  async getDashboardItems(): Promise<WorkItem[]> {
-    if (!this._app || !this._noteSessions) return [];
-    const basePath = ((this._app as any).vault?.adapter?.basePath as string | undefined) ?? "";
-    const parser = this.createParser(this._app, basePath, this._settings);
+  async getDashboardItems(app?: App): Promise<WorkItem[]> {
+    const resolvedApp = app ?? this._app;
+    if (!resolvedApp || !this._noteSessions) return [];
+    // Ensure bindings are loaded even if the main panel hasn't opened yet
+    await this._noteSessions.load();
+    const basePath = ((resolvedApp as any).vault?.adapter?.basePath as string | undefined) ?? "";
+    const parser = new BlackbirdParser(resolvedApp, basePath, this._noteSessions);
     return parser.loadAll();
   }
 
