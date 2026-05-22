@@ -11,7 +11,7 @@
  * in the main Blackbird panel (delegated back to the main view via
  * the `openItemCallback` that main.ts passes in).
  */
-import { ItemView, WorkspaceLeaf, Notice } from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 import type { BlackbirdAdapter } from "./index";
 import type { WorkItem } from "../../core/interfaces";
 import type { BlackbirdTaskMetadata, NoteSessionMetadata } from "./types";
@@ -156,12 +156,16 @@ export class BlackbirdDashboardView extends ItemView {
       text: "🧠 Open Manager",
     });
     btn.onclick = () => {
-      // Open main Blackbird panel; no specific item to select
-      const leaves = this.app.workspace.getLeavesOfType(MAIN_VIEW_TYPE);
-      if (leaves.length > 0) {
-        this.app.workspace.revealLeaf(leaves[0]);
+      // activateView() opens the main Blackbird panel, creating it if needed
+      const plugin = (this.app as any).plugins?.getPlugin?.("blackbird");
+      if (plugin && typeof plugin.activateView === "function") {
+        void plugin.activateView();
       } else {
-        new Notice("Blackbird: Open the Blackbird panel first");
+        // Fallback: reveal existing leaf if present
+        const leaves = this.app.workspace.getLeavesOfType(MAIN_VIEW_TYPE);
+        if (leaves.length > 0) {
+          this.app.workspace.revealLeaf(leaves[0]);
+        }
       }
     };
   }

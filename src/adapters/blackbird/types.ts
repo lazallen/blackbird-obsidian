@@ -1,9 +1,19 @@
 /**
  * Core types for the Blackbird adapter.
  *
- * Blackbird uses a two-tier task model:
- *   Tier 1: A `[*]` line with no wikilink — self-contained, prompt = line text.
- *   Tier 2: A `[*]` line with a [[wikilink]] to a task page — prompt = page contents.
+ * Task format inherited from the Obsidian Tasks plugin:
+ *   - [ ] open task
+ *   - [x] completed task
+ *   - [-] cancelled task
+ *   - [/] in-progress task
+ *   (any character between brackets is valid — Blackbird reads all states)
+ *
+ * Blackbird two-tier task model:
+ *   Tier 1: A task line with no [[wikilink]] — self-contained, prompt = line text.
+ *   Tier 2: A task line with a [[wikilink]] to a task page — prompt = page contents.
+ *
+ * Tags: #pinned (today's focus), #next / #ready (ready to work on).
+ * Only tasks with these tags appear in the Blackbird dashboard.
  *
  * Note sessions: arbitrary vault notes opened into work mode via command.
  */
@@ -16,7 +26,9 @@ export interface BlackbirdTaskMetadata extends Record<string, unknown> {
   isNoteSession: false;
   tier: BlackbirdTier;
   rawLine: string;
-  /** Vault-relative path to the file containing the [*] line. */
+  /** The character inside the checkbox brackets: ' ', 'x', '-', '/', etc. */
+  checkboxState: string;
+  /** Vault-relative path to the file containing the task line. */
   sourceFilePath: string;
   lineNumber: number;
   tags: string[];

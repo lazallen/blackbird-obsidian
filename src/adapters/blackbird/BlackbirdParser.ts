@@ -1,11 +1,15 @@
 /**
- * BlackbirdParser — scans all vault markdown files for [*] task lines and
- * includes registered note sessions from NoteSessionBinder.
+ * BlackbirdParser — scans all vault markdown files for Obsidian Tasks plugin
+ * task lines and includes registered note sessions from NoteSessionBinder.
  *
- * Task format:
- *   [*] Task text [[tasks/TASK-slug]] #tag1 #tag2
+ * Task format (Obsidian Tasks plugin):
+ *   - [ ] Task text [[tasks/TASK-slug]] #tag1 #tag2
+ *   - [x] Completed task ✅ 2026-05-22
+ *   - [-] Cancelled task
+ *   - [/] In-progress task
  *
- * Only tasks tagged #pinned OR (#next OR #ready) are included.
+ * Any checkbox state is parsed. Only tasks tagged #pinned OR (#next OR #ready)
+ * are included in dashboard results.
  * Tasks with a [[wikilink]] are Tier 2; others are Tier 1.
  */
 import type { App, TFile } from "obsidian";
@@ -13,8 +17,15 @@ import type { WorkItem, WorkItemParser } from "../../core/interfaces";
 import type { BlackbirdTaskMetadata, NoteSessionMetadata } from "./types";
 import type { NoteSessionBinder } from "./NoteSessionBinder";
 
-/** [*] line regex: captures text after [*], then optionally a [[wikilink]]. */
-const TASK_LINE_RE = /^\[\*\]\s+(.+)$/;
+/**
+ * Task line regex — matches any Obsidian checkbox regardless of state:
+ *   - [ ] open task
+ *   - [x] completed task
+ *   - [-] cancelled task
+ *   - [/] in-progress task
+ * Captures the text content after the marker.
+ */
+const TASK_LINE_RE = /^- \[.\]\s+(.+)$/;
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
 const TAG_RE = /#[\w/]+/g;
 const DATE_RE = /\s*(📅|⏳|✅)\s*\d{4}-\d{2}-\d{2}/gu;
@@ -156,10 +167,18 @@ export class BlackbirdParser implements WorkItemParser {
       const match = line.match(TASK_LINE_RE);
       if (!match) continue;
 
+      // Extract checkbox state character: ' ', 'x', '-', '/', etc.
+      const checkboxMatch = line.match(/^- \[(.)\]/);
+      const checkboxState = checkboxMatch ? checkboxMatch[1] : " ";
+
       const rawContent = match[1];
       const tags = extractTags(rawContent);
       const state = determineState(tags);
       if (!state) continue;
+
+      // Skip completed (x), cancelled (-), and other non-actionable states.
+      // Only surface open (space) and in-progress (/) tasks.
+      if (checkboxState !== " " && checkboxState !== "/") continue;
 
       const wikilinks = extractWikilinks(rawContent);
       const hasPage = wikilinks.length > 0;
@@ -188,6 +207,7 @@ export class BlackbirdParser implements WorkItemParser {
         isNoteSession: false,
         tier: hasPage ? 2 : 1,
         rawLine: line,
+        checkboxState,
         sourceFilePath: file.path,
         lineNumber: i,
         tags,
