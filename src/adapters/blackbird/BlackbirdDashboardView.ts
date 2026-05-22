@@ -151,6 +151,7 @@ export class BlackbirdDashboardView extends ItemView {
 
   private renderManagerButton(container: HTMLElement): void {
     const section = container.createEl("div", { cls: "bb-dashboard-section bb-manager-section" });
+
     const btn = section.createEl("button", {
       cls: "bb-dashboard-manager-btn",
       text: "🧠 Open Manager",
@@ -168,5 +169,45 @@ export class BlackbirdDashboardView extends ItemView {
         }
       }
     };
+
+    const journalBtn = section.createEl("button", {
+      cls: "bb-dashboard-journal-btn",
+      text: "📓 Today's Journal",
+    });
+    journalBtn.onclick = () => void this.openTodayJournal();
+  }
+
+  private async openTodayJournal(): Promise<void> {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+
+    // Half-year folder: H1 = Jan–Jun, H2 = Jul–Dec
+    const half = now.getMonth() < 6 ? "H1" : "H2";
+    const journalPath = `Journal/${yyyy}-${half}/${dateStr}.md`;
+
+    let file = this.app.vault.getAbstractFileByPath(journalPath) as import("obsidian").TFile | null;
+
+    if (!file) {
+      // Try to create the note using the Daily Notes plugin if available
+      const dailyNotes = (this.app as any).plugins?.getPlugin?.("daily-notes");
+      if (dailyNotes && typeof dailyNotes.openTodayNote === "function") {
+        await dailyNotes.openTodayNote();
+        return;
+      }
+      // Fallback: create a blank note at the expected path
+      try {
+        await this.app.vault.create(journalPath, `# ${dateStr}\n\n## New Tasks\n\n## Day Notes\n`);
+        file = this.app.vault.getAbstractFileByPath(journalPath) as import("obsidian").TFile;
+      } catch {
+        new (await import("obsidian")).Notice(`Could not create journal: ${journalPath}`);
+        return;
+      }
+    }
+
+    const leaf = this.app.workspace.getLeaf(false);
+    await leaf.openFile(file);
   }
 }

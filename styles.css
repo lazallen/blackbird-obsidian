@@ -2673,5 +2673,13 @@ button.wt-spawn-claude-ctx:hover svg {
   background: var(--interactive-accent); color: var(--text-on-accent);
   border: none; border-radius: 5px; cursor: pointer;
   font-size: 12px; font-weight: 600; text-align: left;
+  margin-bottom: 4px;
 }
 .bb-dashboard-manager-btn:hover { background: var(--interactive-accent-hover); }
+.bb-dashboard-journal-btn {
+  width: 100%; padding: 7px 10px;
+  background: var(--background-modifier-border); color: var(--text-normal);
+  border: none; border-radius: 5px; cursor: pointer;
+  font-size: 12px; font-weight: 500; text-align: left;
+}
+.bb-dashboard-journal-btn:hover { background: var(--background-modifier-hover); }
